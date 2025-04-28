@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Rankings</title>
+  
+  <!-- STYLES -->
+  <style>
+    body {
+        background: radial-gradient(circle, #1e3036 1px, transparent 1px); /* Polka dot pattern */
+        background-color: #b4f9f4; /* Dark dreamy purple background */
+        background-size: 20px 20px; /* Size of each dot and spacing */
+        margin: 0;
+        height: 100vh; /* Make the background cover the full viewport height */
+        display: flex; /* Enables flexbox */
+        justify-content: center; /* Centers the content horizontally */
+        align-items: center; /* Centers the content vertically */
+    }
+
+    #container {
+    background: rgb(57, 3, 88);
+    padding: 30px;
+    border-radius: 10px;
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    text-align: top;
+    transition: all 0.3s ease-in-out;
+    margin: 0 auto; /* Center the container (this works now) */
+    background: white;
+    border: 15px solid transparent;
+    background-clip: padding-box; /* Ensures the background is not visible in the border area */
+    animation: gradientBorder 5s linear infinite; /* Animation for the border */
+    }
+
+    @keyframes gradientBorder {
+    0% {
+        border-image: linear-gradient(45deg, #2c7484, #401cad) 1;
+    }
+    25% {
+        border-image: linear-gradient(135deg, #14424d, #5f1870) 1;
+    }
+    50% {
+        border-image: linear-gradient(225deg, #2c7484, #5f1870) 1;
+    }
+    75% {
+        border-image: linear-gradient(315deg, #5f1870, #2c7484) 1;
+    }
+    100% {
+        border-image: linear-gradient(45deg, #2c7484, #401cad) 1;
+    }
+    }
+
+    h2, h3 {
+    color: #333;
+    margin-bottom: 20px;
+    }
+
+    input[type="number"] {
+    width: 90%;
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    }
+
+    button {
+    background-color: #33215c;
+    color: white;
+    padding: 12px 25px;
+    margin: 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s;
+    }
+
+    button:hover {
+    background-color: #33215c;
+    }
+
+    ol {
+    text-align: left;
+    padding-left: 20px;
+    }
+
+    .gold { font-weight: bold; color: #05050c; }
+    .silver { font-weight: bold; color: #000000; }
+    .bronze { font-weight: bold; color: #000000; }
+
+    #result-area {
+    margin-top: 20px;
+    }
+
+    #background-heading {
+  position: absolute;
+  top: 40px;
+  width: 100%;
+  text-align: center;
+  font-size: 48px;
+  color: #270663; /* soft dreamy purple */
+  font-family: 'italics', 'Fantasy', 'Times New Roman', Times, serif;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 5px #00000080;
+  z-index: 1;
+}
+
+  </style>
+  
+</head>
+<body>
+    <h1 id="background-heading">Ranking System</h1>
+    <div class="sparkle" style="top: 20%; left: 30%; animation-delay: 0s;"></div>
+    <div class="sparkle" style="top: 50%; left: 70%; animation-delay: 2s;"></div>
+    <div class="sparkle" style="top: 80%; left: 40%; animation-delay: 4s;"></div>
+    <div class="sparkle" style="top: 10%; left: 60%; animation-delay: 3s;"></div>
+    <div class="sparkle" style="top: 90%; left: 20%; animation-delay: 1s;"></div>
+    
+<div id="container">
+  <h2 id="heading">Enter Number of Students</h2>
+
+  <div id="form-area">
+    <input type="number" id="student-count" min="1">
+    <button onclick="nextStep()">Next</button>
+  </div>
+
+  <div id="result-area">
+    <ol>
+
+    </ol>
+
+
+  </div>
+</div>
+
+<!-- JAVASCRIPT -->
+<script>
+    let numberOfStudents;
+    let marksList = [];
+    let currentIndex = 0;
+    let totalMarks;
+  
+    document.addEventListener('DOMContentLoaded', function () {
+      // Event listener for Enter key on student count input
+      document.getElementById('student-count')?.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+          nextStep(); // Trigger nextStep when Enter is pressed
+        }
+      });
+  
+      // Event listener for Enter key on marks input
+      document.getElementById('marks')?.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+          submitMarks(); // Trigger submitMarks when Enter is pressed
+        }
+      });
+  
+      // Event listener for Enter key on total marks input
+      document.getElementById('total-marks')?.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+          calculateAndShowResults(); // Trigger calculateAndShowResults when Enter is pressed
+        }
+      });
+    });
+  
+    function nextStep() {
+      numberOfStudents = parseInt(document.getElementById('student-count').value);
+      if (isNaN(numberOfStudents) || numberOfStudents <= 0) {
+        alert("Please enter a valid number of students.");
+        return;
+      }
+      showMarksInput();
+    }
+  
+    function showMarksInput() {
+      const formArea = document.getElementById('form-area');
+      formArea.innerHTML = `  
+        <h3>Enter Marks for Student ${currentIndex + 1}</h3>
+        <input type="number" id="marks" min="0" autofocus>
+        <button onclick="submitMarks()">Submit</button>
+      `;
+      document.getElementById('heading').innerText = "Student Marks Input";
+  
+      // Focus the input field automatically
+      document.getElementById('marks').focus();
+  
+      // Ensure Enter key triggers the submit for marks
+      document.getElementById('marks').addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+          submitMarks();  // Trigger submitMarks when Enter is pressed
+        }
+      });
+    }
+  
+    function submitMarks() {
+      const mark = parseFloat(document.getElementById('marks').value);
+      if (isNaN(mark) || mark < 0) {
+        alert("Please enter a valid mark.");
+        return;
+      }
+      marksList.push({ id: currentIndex + 1, marks: mark });
+      currentIndex++;
+      if (currentIndex < numberOfStudents) {
+        showMarksInput();
+      } else {
+        askTotalMarks();
+      }
+    }
+  
+    function askTotalMarks() {
+      const formArea = document.getElementById('form-area');
+      formArea.innerHTML = `
+        <h3>Enter Total Marks</h3>
+        <input type="number" id="total-marks" min="1" autofocus>
+        <button onclick="calculateAndShowResults()">Calculate</button>
+      `;
+      document.getElementById('heading').innerText = "Total Marks Input";
+  
+      // Focus the input field automatically
+      document.getElementById('total-marks').focus();
+  
+      // Add event listener for Enter key on total marks input
+      document.getElementById('total-marks').addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+          calculateAndShowResults();  // Trigger calculateAndShowResults when Enter is pressed
+        }
+      });
+    }
+  
+    function calculateAndShowResults() {
+      totalMarks = parseFloat(document.getElementById('total-marks').value);
+      if (isNaN(totalMarks) || totalMarks <= 0) {
+        alert("Please enter a valid total marks.");
+        return;
+      }
+  
+      marksList.forEach(student => {
+        student.percentage = ((student.marks / totalMarks) * 100).toFixed(2);
+      });
+  
+      marksList.sort((a, b) => b.percentage - a.percentage);
+  
+      // Create result area
+      const resultArea = document.getElementById('result-area');
+      resultArea.innerHTML = "<h3>Results</h3>"; // Add a heading for the results
+  
+      let html = "<ol>";
+      marksList.forEach((student, index) => {
+        let medalEmoji = '';
+        if (index === 0) medalEmoji = '🥇'; // Gold medal emoji
+        else if (index === 1) medalEmoji = '🥈'; // Silver medal emoji
+        else if (index === 2) medalEmoji = '🥉'; // Bronze medal emoji
+  
+        html += `<li>${medalEmoji} Student ${student.id}: ${student.percentage}%</li>`;
+      });
+      html += "</ol>";
+  
+      html += `<button onclick="downloadResults()">Download Results</button>
+               <button onclick="resetForm()">Reset</button>`;
+      resultArea.innerHTML += html;
+    }
+  
+    function downloadResults() {
+      let content = "Ranked Students List:\n";
+      marksList.forEach((student, index) => {
+        content += `${index + 1}. Student ${student.id} - ${student.percentage}%\n`;
+      });
+  
+      const blob = new Blob([content], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "student_rankings.txt";
+      link.click();
+    }
+  
+    function resetForm() {
+      marksList = [];
+      currentIndex = 0;
+      totalMarks = null;
+  
+      document.getElementById('result-area').innerHTML = "";
+      document.getElementById('form-area').innerHTML = ` 
+        <input type="number" id="student-count" min="1" autofocus>
+        <button onclick="nextStep()">Next</button>
+      `;
+      document.getElementById('heading').innerText = "Enter Number of Students";
+  
+      // Focus the input field automatically
+      document.getElementById('student-count').focus();
+    }
+  </script>
+  
+  
+
+</body>
+</html>
